@@ -1,44 +1,39 @@
+// https://js.langchain.com/docs/modules/model_io/chat/quick_start
 import { ChatOllama } from '@langchain/community/chat_models/ollama';
 import {
-  ChatPromptTemplate,
-  HumanMessagePromptTemplate,
-  SystemMessagePromptTemplate,
-} from '@langchain/core/prompts';
+  HumanMessage, SystemMessage, AIMessage
+} from '@langchain/core/messages';
 import prompts from 'prompts';
 
 const model = new ChatOllama({
-  model: 'tinyllama',
+  model: 'gemma:2b',
 });
 
-// const run = async () => {
-//   const resp = await chat.invoke(
-//     'write a javascript function that adds 2 numbers'
-//   );
-//   console.log(resp);
-// };
-
-// run();
-// https://api.js.langchain.com/classes/langchain_core_prompts.HumanMessagePromptTemplate.html
-const message = SystemMessagePromptTemplate.fromTemplate('{text}');
-const prompt = ChatPromptTemplate.fromMessages([
-  ['system', 'You are an expert software engineer.'],
-  message,
-]);
+const messages = [
+  new SystemMessage("You're a helpful assistant"),
+];
 
 const run = async () => {
+  console.log('What can I help you with? (Type "exit" to quit)')
+
   let exit = false;
   while (!exit) {
-    const response = await prompts({
+    const userInput = await prompts({
       type: 'text',
       name: 'value',
-      message: 'How old are you? (Type "exit" to quit)',
+      message: '>>',
     });
 
-    console.log(response);
-
-    if (response.value.toLowerCase() === 'exit') {
+    if (userInput.value.toLowerCase() === 'exit') {
       exit = true;
+      break;
     }
+
+    messages.push(new HumanMessage(userInput.value));
+
+    const modelResp = await model.invoke(messages);
+    messages.push(new AIMessage(String(modelResp.content)))
+    console.log(modelResp.content);
   }
 };
 
