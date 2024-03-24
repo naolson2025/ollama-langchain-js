@@ -17,6 +17,8 @@ const messages = [
 ];
 
 const run = async () => {
+  // move all db operations to a separate file
+  // so I can load the db & then run the prompts separately
   const loader = new TextLoader("src/facts.txt");
   const docs = await loader.load();
   // separate the doc into chunks using langchain text splitter
@@ -26,8 +28,14 @@ const run = async () => {
   // calculate embeddings for each chunk
   // there are multiple ways to calculate embeddings
   // could use SentenceTransformer (free), or OpenAI embeddings (cost), or other embeddings
+  // use ollama embeddings
 
   // store the embeddings in a database
+  // ChromaDB uses SQLite as the default database
+  // store the embeddings in the database
+
+  // when the user asks a question, query similar embeddings from the database
+  // use langchain retrievalQA to query the database
 
   console.log('What can I help you with? (Type "exit" to quit)')
 
